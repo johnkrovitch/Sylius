@@ -16,6 +16,8 @@ Enjoy being an eCommerce Developer again!
 Installation
 ------------
 
+[![GuardRails badge](https://badges.production.guardrails.io/johnkrovitch/Sylius.svg)](https://www.guardrails.io)
+
 [Install Sylius](http://docs.sylius.com/en/1.0/book/installation/installation.html) with Composer (see [requirements details](http://docs.sylius.com/en/1.0/book/installation/requirements.html)).
 
 Alternatively, you can [use our Vagrant setup](http://docs.sylius.com/en/1.0/book/installation/vagrant_installation.html).
