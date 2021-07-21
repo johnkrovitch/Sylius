@@ -24,10 +24,10 @@ Installing Sylius Plus as a plugin to a Sylius application
 
 .. tip::
 
-    If it is a new project you are initiating, then first install Sylius-Standard in **version ^1.9** according to
+    If it is a new project you are initiating, then first install Sylius-Standard in **version ^1.10** according to
     :doc:`these instructions </book/installation/installation>`.
 
-    If you're installing Plus package to an existing project, then make sure you're upgraded to ``sylius/sylius ^1.9``.
+    If you're installing Plus package to an existing project, then make sure you're upgraded to ``sylius/sylius ^1.10``.
 
 **1.** Configure access to the private Packagist package in composer by using the Access Token you have been given with your license.
 
@@ -41,7 +41,6 @@ Installing Sylius Plus as a plugin to a Sylius application
 
     composer config repositories.plus composer https://sylius.repo.packagist.com/ShortNameOfYourOrganization/
     composer require sylius/plus --no-update
-    composer config minimum-stability rc #due to the usage of some pre-stable packages (like SyliusRefundPlugin)
     composer update --no-scripts
     composer sync-recipes
 
@@ -60,7 +59,7 @@ Installing Sylius Plus as a plugin to a Sylius application
 
 .. code-block:: yaml
 
-    // config/packages/_sylius.yaml
+    # config/packages/_sylius.yaml
     imports:
     ...
         - { resource: "@SyliusPlusPlugin/Resources/config/config.yaml" }
@@ -69,7 +68,7 @@ Installing Sylius Plus as a plugin to a Sylius application
 
 .. code-block:: yaml
 
-    // config/routes/sylius_shop.yaml
+    # config/routes/sylius_shop.yaml
     ...
 
     sylius_plus_shop:
@@ -80,21 +79,24 @@ Installing Sylius Plus as a plugin to a Sylius application
 
 .. code-block:: yaml
 
-    // config/routes/sylius_admin.yaml:
-    #...
+    # config/routes/sylius_admin.yaml:
+    ...
 
     sylius_plus_admin:
         resource: "@SyliusPlusPlugin/Resources/config/admin_routing.yaml"
         prefix: /admin
+.. warning::
 
-.. code-block:: yaml
+    Not needed for Sylius Plus >= `1.0.0-ALPHA.1`
 
-    // config/routes/sylius_admin_api.yaml:
-    #...
+    .. code-block:: yaml
 
-    sylius_plus_admin_api:
-        resource: "@SyliusPlusPlugin/Resources/config/api_routing.yaml"
-        prefix: /api/v1
+        # config/routes/sylius_admin_api.yaml:
+        ...
+
+        sylius_plus_admin_api:
+            resource: "@SyliusPlusPlugin/Resources/config/api_routing.yaml"
+            prefix: /api/v1
 
 **6.** Add traits that enhance Sylius models:
 
@@ -103,14 +105,13 @@ Installing Sylius Plus as a plugin to a Sylius application
 * Customer
 * Order
 * ProductVariant
-* Shipment (trait + interface from RefundPlugin)
-* Adjustment (interface from RefundPlugin)
+* Shipment
 
 .. code-block:: php
 
-    <?php
-
     // src/Entity/User/AdminUser.php
+
+    <?php
 
     declare(strict_types=1);
 
@@ -145,9 +146,9 @@ Installing Sylius Plus as a plugin to a Sylius application
 
 .. code-block:: php
 
-    <?php
-
     // src/Entity/Channel/Channel.php
+
+    <?php
 
     declare(strict_types=1);
 
@@ -170,9 +171,9 @@ Installing Sylius Plus as a plugin to a Sylius application
 
 .. code-block:: php
 
-    <?php
-
     // src/Entity/Customer/Customer.php
+
+    <?php
 
     declare(strict_types=1);
 
@@ -195,9 +196,9 @@ Installing Sylius Plus as a plugin to a Sylius application
 
 .. code-block:: php
 
-    <?php
-
     // src/Entity/Order/Order.php
+
+    <?php
 
     declare(strict_types=1);
 
@@ -220,9 +221,9 @@ Installing Sylius Plus as a plugin to a Sylius application
 
 .. code-block:: php
 
-    <?php
-
     // src/Entity/Product/ProductVariant.php
+
+    <?php
 
     declare(strict_types=1);
 
@@ -260,9 +261,9 @@ Installing Sylius Plus as a plugin to a Sylius application
 
 .. code-block:: php
 
-    <?php
-
     // src/Entity/Shipping/Shipment.php
+
+    <?php
 
     declare(strict_types=1);
 
@@ -273,37 +274,14 @@ Installing Sylius Plus as a plugin to a Sylius application
     use Sylius\Component\Core\Model\Shipment as BaseShipment;
     use Sylius\Plus\Entity\ShipmentInterface;
     use Sylius\Plus\Entity\ShipmentTrait;
-    use Sylius\RefundPlugin\Entity\ShipmentInterface as RefundShipmentInterface;
 
     /**
      * @Entity
      * @Table(name="sylius_shipment")
      */
-    class Shipment extends BaseShipment implements ShipmentInterface, RefundShipmentInterface
+    class Shipment extends BaseShipment implements ShipmentInterface
     {
         use ShipmentTrait;
-    }
-
-.. code-block:: php
-
-    <?php
-
-    // src/Entity/Order/Adjustment.php
-
-    declare(strict_types=1);
-
-    namespace App\Entity\Order;
-
-    use Doctrine\ORM\Mapping as ORM;
-    use Sylius\Component\Core\Model\Adjustment as BaseAdjustment;
-    use Sylius\RefundPlugin\Entity\AdjustmentInterface as RefundAdjustmentInterface;
-
-    /**
-     * @ORM\Entity
-     * @ORM\Table(name="sylius_adjustment")
-     */
-    class Adjustment extends BaseAdjustment implements RefundAdjustmentInterface
-    {
     }
 
 **7.** Add wkhtmltopdf binary for Invoicing purposes.

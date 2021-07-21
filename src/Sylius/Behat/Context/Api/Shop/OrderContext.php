@@ -288,7 +288,7 @@ final class OrderContext implements Context
             ->getValue($this->client->show($this->sharedStorage->get('cart_token')), 'payments')[0]
         ;
 
-        Assert::same($this->iriConverter->getIriFromItem($paymentMethod), $payment['method']['@id']);
+        Assert::same($this->iriConverter->getIriFromItem($paymentMethod), $payment['method']);
     }
 
     /**
@@ -297,6 +297,14 @@ final class OrderContext implements Context
     public function iShouldNotBeAbleToSeeThatOrder(): void
     {
         Assert::false($this->responseChecker->isShowSuccessful($this->client->getLastResponse()));
+    }
+
+    /**
+     * @Then I should be denied an access to order list
+     */
+    public function iShouldDeniedAnAccessToOrderList(): void
+    {
+        Assert::true($this->responseChecker->hasAccessDenied($this->client->getLastResponse()));
     }
 
     /**

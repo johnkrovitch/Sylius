@@ -27,9 +27,12 @@ api_platform:
         SM\SMException: 422
         Sylius\Bundle\ApiBundle\Exception\CannotRemoveCurrentlyLoggedInUser: 422
         Sylius\Bundle\ApiBundle\Exception\ShippingMethodCannotBeRemoved: 422
+        Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException: 400
     collection:
         pagination:
             client_items_per_page: true
+    mapping:
+        paths: ['%kernel.project_dir%/config/api_platform']
 
 lexik_jwt_authentication:
     token_extractors:

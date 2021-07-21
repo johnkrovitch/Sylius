@@ -191,6 +191,7 @@ final class CheckoutContext implements Context
 
     /**
      * @When /^I specify the billing (address as "([^"]+)", "([^"]+)", "([^"]+)", "([^"]+)" for "([^"]+)")$/
+     * @When /^the visitor changes the billing (address to "([^"]+)", "([^"]+)", "([^"]+)", "([^"]+)" for "([^"]+)")$/
      * @When /^the (?:customer|visitor) specify the billing (address as "([^"]+)", "([^"]+)", "([^"]+)", "([^"]+)" for "([^"]+)")$/
      * @When /^I specify the billing (address for "([^"]+)" from "([^"]+)", "([^"]+)", "([^"]+)", "([^"]+)", "([^"]+)")$/
      * @Given /^the (?:visitor|customer) has specified (address as "([^"]+)", "([^"]+)", "([^"]+)", "([^"]+)" for "([^"]+)")$/
@@ -314,7 +315,7 @@ final class CheckoutContext implements Context
     /**
      * @When I complete the addressing step
      * @When I try to complete the addressing step
-     * @When /^the (?:customer|visitor) complete the addressing step$/
+     * @When /^the (?:customer|visitor) completes the addressing step$/
      * @Given /^the (?:customer|visitor) has completed the addressing step$/
      * @When the visitor try to complete the addressing step in the customer cart
      */
@@ -420,6 +421,17 @@ final class CheckoutContext implements Context
     }
 
     /**
+     * @Then I should be notified that the order should be addressed first
+     */
+    public function iShouldBeNotifiedThatTheOrderShouldBeAddressedFirst(): void
+    {
+        Assert::true($this->isViolationWithMessageInResponse(
+            $this->ordersClient->getLastResponse(),
+            'Order should be addressed first.'
+        ));
+    }
+
+    /**
      * @Then I should be informed that shipping method with code :code does not exist
      */
     public function iShouldBeInformedThatShippingMethodWithCodeDoesNotExist(string $code): void
@@ -494,6 +506,7 @@ final class CheckoutContext implements Context
 
     /**
      * @Then /^(address "[^"]+", "[^"]+", "[^"]+", "[^"]+", "[^"]+", "[^"]+") should be filled as (billing) address$/
+     * @Then /^the visitor should has ("[^"]+", "[^"]+", "[^"]+", "[^"]+", "[^"]+" specified as) (billing) address$/
      */
     public function addressShouldBeFilledAsBillingAddress(AddressInterface $address, string $addressType): void
     {
@@ -502,6 +515,7 @@ final class CheckoutContext implements Context
 
     /**
      * @Then /^(address "[^"]+", "[^"]+", "[^"]+", "[^"]+", "[^"]+", "[^"]+") should be filled as (shipping) address$/
+     * @Then /^the visitor should has ("[^"]+", "[^"]+", "[^"]+", "[^"]+", "[^"]+" specified as) (shipping) address$/
      */
     public function addressShouldBeFilledAsShippingAddress(AddressInterface $address, string $addressType): void
     {
@@ -669,7 +683,7 @@ final class CheckoutContext implements Context
         $shippingMethodName = $shippingMethod->getName();
 
         foreach ($shippingMethods as $method) {
-            if ($method['shippingMethod']['translations']['en_US']['name'] === $shippingMethodName) {
+            if ($method['translations']['en_US']['name'] === $shippingMethodName) {
                 return;
             }
         }
@@ -783,7 +797,7 @@ final class CheckoutContext implements Context
     {
         $shippingMethods = $this->getCartShippingMethods($this->getCart());
 
-        Assert::true($shippingMethods[0]['shippingMethod']['code'] === $shippingMethod->getCode());
+        Assert::true($shippingMethods[0]['code'] === $shippingMethod->getCode());
     }
 
     /**
@@ -793,7 +807,7 @@ final class CheckoutContext implements Context
     {
         $shippingMethods = $this->getCartShippingMethods($this->getCart());
 
-        Assert::true(end($shippingMethods)['shippingMethod']['code'] === $shippingMethod->getCode());
+        Assert::true(end($shippingMethods)['code'] === $shippingMethod->getCode());
     }
 
     /**
@@ -860,6 +874,8 @@ final class CheckoutContext implements Context
      */
     public function thereShouldBeNoTaxesCharged(): void
     {
+        $this->ordersClient->show($this->sharedStorage->get('cart_token'));
+
         Assert::same($this->responseChecker->getValue($this->ordersClient->getLastResponse(), 'taxTotal'), 0);
     }
 
@@ -1194,7 +1210,7 @@ final class CheckoutContext implements Context
     private function hasShippingMethod(ShippingMethodInterface $shippingMethod): bool
     {
         foreach ($this->getCartShippingMethods($this->getCart()) as $cartShippingMethod) {
-            if ($cartShippingMethod['shippingMethod']['code'] === $shippingMethod->getCode()) {
+            if ($cartShippingMethod['code'] === $shippingMethod->getCode()) {
                 return true;
             }
         }
@@ -1207,7 +1223,7 @@ final class CheckoutContext implements Context
         foreach ($this->getCartShippingMethods($this->getCart()) as $cartShippingMethod) {
             if (
                 $cartShippingMethod['price'] === $fee &&
-                $cartShippingMethod['shippingMethod']['code'] === $shippingMethod->getCode()
+                $cartShippingMethod['code'] === $shippingMethod->getCode()
             ) {
                 return true;
             }
